@@ -15,10 +15,26 @@ cp .env.example .env && docker compose up -d
 后端健康检查：<http://localhost:21108/health>
 
 
+## 过站放行联动（核心业务规则）
+
+放行接口：`POST /api/flight-turnaround/:id/release`
+
+- **放行门禁（三项必须同时满足，缺一整次拒绝，HTTP 409）**
+  1. 航班下所有地勤任务必须是 `SIGNED`
+  2. 未关闭延误事件（`resolved_at` 为空）必须为零
+  3. 资源预约不能存在无法自动释放的状态（`CONFLICT` 必须先人工解决；普通 `ACTIVE` 会在放行事务中被一次性释放，放行后预约不再 ACTIVE）
+- 拒绝响应 `error.details` 分别返回 `unsigned_tasks` / `open_delays` / `blocking_bookings` 三类阻塞清单；失败时航班、任务、预约全部保持原样。
+- 门禁通过后单事务完成：航班进入 `READY`（写 `ready_at`）→ 该航班下 `ACTIVE` 预约一次性置为 `RELEASED`、对应资源回到 `AVAILABLE` → 任务与过站时间线同步刷新。
+- **重复放行 / 并发提交只生效一次**：按航班 ID 互斥 + 条件更新（仅非 READY/DEPARTED 可推进），后到者得到 `RELEASE_ALREADY_DONE` / `RELEASE_RACE_LOST`。
+- 看板（`/dashboard`）逐航班展示阻塞明细，并可就地签收任务、关闭延误、解决预约冲突后再放行。
+- 配套写接口：`POST /api/ground-task/:id/sign`、`POST /api/delay-event/:id/resolve`、`POST /api/resource-booking/:id/resolve-conflict`；门禁快照：`GET /api/flight-turnaround/:id/gate`。
+
 ## 本地开发方式
 
 - 前端：`cd frontend && npm install && npm run dev`
-- 后端：进入 `backend` 后按技术栈运行开发命令，接口统一挂在 `/api`。
+- 后端：进入 `backend` 后 `go run .`（本地默认使用纯 Go SQLite 文件 `ground-turn.db`，无需起 MySQL，首启自动建表并灌入 3 个演示航班；容器内存在 `DB_HOST` 时切换为 MySQL）
+- 接口统一挂在 `/api`。Vite dev server 已把 `/api`、`/health` 代理到 `http://localhost:3000`。
+
 
 
 ## 技术栈
@@ -54,9 +70,12 @@ backend/src/routes, controllers, services, models, repositories, middlewares, co
 
 ## 枚举/常量出现位置清单
 
-- GroundTaskType: constants/GroundTaskType、types/GroundTaskType、constructors、logTemplates、errorMessages、筛选器、展示组件/控制器均有引用。
-- TurnaroundStatus: constants/TurnaroundStatus、types/TurnaroundStatus、constructors、logTemplates、errorMessages、筛选器、展示组件/控制器均有引用。
-- ResourceStatus: constants/ResourceStatus、types/ResourceStatus、constructors、logTemplates、errorMessages、筛选器、展示组件/控制器均有引用。
+- GroundTaskType: constants/GroundTaskType（前后端）、types/GroundTaskType（前端重复定义）、constructors、logTemplates、errorMessages、TasksPage 筛选/展示、后端 seed/controller 均有引用。
+- TurnaroundStatus: constants/TurnaroundStatus（前后端）、types/TurnaroundStatus（前端重复定义）、constructors、logTemplates、errorMessages、Dashboard/Turnarounds 筛选器、StatusBadge/TurnaroundTimeline 展示、后端 release service 条件更新。
+- ResourceStatus: constants/ResourceStatus（前后端）、types/ResourceStatus（前端重复定义）、constructors、logTemplates、errorMessages、ResourcesPage 筛选展示、放行事务资源置 AVAILABLE。
+- GroundTaskStatus（DISPATCHED/IN_PROGRESS/SIGNED/BLOCKED）: 后端 constants/GroundTaskStatus.go、models/GroundTask、repositories、constructors、logTemplates、放行门禁 service；前端 constants/GroundTaskStatus.ts、types/GroundTask、TasksPage、BlockerDetails、StatusBadge、seedData。
+- BookingStatus（ACTIVE/RELEASED/CONFLICT）: 后端 constants/BookingStatus.go、models/ResourceBooking、repositories（批量释放/解冲突）、logTemplates、放行门禁 service；前端 constants/BookingStatus.ts、types/ResourceBooking、ResourcesPage、BlockerDetails、useResourceConflict、seedData。
+- 放行错误码（RELEASE_BLOCKED/RELEASE_ALREADY_DONE/RELEASE_RACE_LOST/TASK_ALREADY_SIGNED 等）: 后端 constants/errorCodes.go、errorMessages.go、controllers/response.go；前端 constants/errorCodes.ts、errorMessages.ts、types/Api.ts、ReleaseStore、DashboardPage。
 
 ## 为什么会牵一发动全身
 

@@ -1,8 +1,20 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 
-export function useResourceConflict<T>(rows: T[] = []) {
-  const [page, setPage] = useState(1);
-  const pageSize = 8;
-  const pageRows = useMemo(() => rows.slice((page - 1) * pageSize, page * pageSize), [rows, page]);
-  return { page, setPage, pageSize, pageRows, total: rows.length };
+import type { ResourceBooking } from "../types/ResourceBooking";
+
+// useResourceConflict 统计 ACTIVE/CONFLICT 预约，资源页与看板共用。
+export function useResourceConflict(bookings: ResourceBooking[] = []) {
+  return useMemo(() => {
+    const active = bookings.filter((booking) => booking.booking_status === "ACTIVE");
+    const conflicts = bookings.filter((booking) => booking.booking_status === "CONFLICT");
+    const released = bookings.filter((booking) => booking.booking_status === "RELEASED");
+    return {
+      active,
+      conflicts,
+      released,
+      activeCount: active.length,
+      conflictCount: conflicts.length,
+      releasedCount: released.length
+    };
+  }, [bookings]);
 }

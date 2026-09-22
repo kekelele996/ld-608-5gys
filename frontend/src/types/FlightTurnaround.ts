@@ -1,3 +1,5 @@
+import type { ReleaseGate, TurnaroundProgress } from "./ReleaseGate";
+
 export interface FlightTurnaround {
   id: number;
   flight_no: string;
@@ -7,4 +9,16 @@ export interface FlightTurnaround {
   departure_time: string;
   turnaround_status: string;
   delay_reason: string;
+  ready_at: string | null;
+  progress: TurnaroundProgress;
+  gate: ReleaseGate;
+}
+
+export interface ReleaseResult {
+  turnaround_id: number;
+  flight_no: string;
+  turnaround_status: string;
+  ready_at: string;
+  released_bookings: number;
+  gate: ReleaseGate;
 }

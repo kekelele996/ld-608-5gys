@@ -1,14 +1,17 @@
 import type { FlightTurnaround } from "../types/FlightTurnaround";
 
 export const createDefaultFlightTurnaround = (overrides: Partial<FlightTurnaround> = {}): FlightTurnaround => ({
-  id: 1 as never,
-  flight_no: "flight no 1" as never,
-  aircraft_reg: "aircraft reg 1" as never,
-  stand_no: "stand no 1" as never,
-  arrival_time: "2026-06-11T09:00:00Z" as never,
-  departure_time: "2026-06-11T09:00:00Z" as never,
-  turnaround_status: "ON_STAND" as never,
-  delay_reason: "delay reason 1" as never,
+  id: 0,
+  flight_no: "",
+  aircraft_reg: "",
+  stand_no: "",
+  arrival_time: "",
+  departure_time: "",
+  turnaround_status: "ARRIVING",
+  delay_reason: "",
+  ready_at: null,
+  progress: { total_tasks: 0, signed_tasks: 0, open_delays: 0, active_bookings: 0 },
+  gate: { releasable: false, unsigned_tasks: [], open_delays: [], blocking_bookings: [] },
   ...overrides
 });
 

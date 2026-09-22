@@ -1,21 +1,21 @@
 import { mockData } from "../mocks/seedData";
 import type { ResourceBooking } from "../types/ResourceBooking";
+import { request } from "./request";
 
 const endpoint = "/api/resource-booking";
 
 export async function listResourceBooking(): Promise<ResourceBooking[]> {
-  if (typeof fetch !== "undefined" && endpoint.startsWith("/api") && true) {
-    try {
-      const res = await fetch(endpoint);
-      if (res.ok) return await res.json();
-    } catch {
-      // Local mock fallback keeps the UI available during offline review.
-    }
+  try {
+    return await request<ResourceBooking[]>(endpoint);
+  } catch {
+    return [...mockData.resourceBooking];
   }
-  return [...(mockData.resourceBooking as unknown as ResourceBooking[])];
 }
 
-export async function saveResourceBooking(payload: ResourceBooking) {
-  console.info("save ResourceBooking", payload);
-  return payload;
+// resolveBookingConflict 解决预约冲突（CONFLICT -> ACTIVE），ACTIVE 由放行事务一次性释放。
+export async function resolveBookingConflict(id: number, actor = "dispatcher"): Promise<ResourceBooking> {
+  return request<ResourceBooking>(`${endpoint}/${id}/resolve-conflict`, {
+    method: "POST",
+    body: JSON.stringify({ actor })
+  });
 }

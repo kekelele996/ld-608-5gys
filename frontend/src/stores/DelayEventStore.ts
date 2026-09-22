@@ -2,7 +2,12 @@ import { create } from "zustand";
 import { listDelayEvent } from "../api/DelayEvent";
 import type { DelayEvent } from "../types/DelayEvent";
 
-type State = { rows: DelayEvent[]; loading: boolean; load: () => Promise<void> };
+type State = {
+  rows: DelayEvent[];
+  loading: boolean;
+  load: () => Promise<void>;
+  setRows: (rows: DelayEvent[]) => void;
+};
 
 export const useDelayEventStore = create<State>((set) => ({
   rows: [],
@@ -10,5 +15,8 @@ export const useDelayEventStore = create<State>((set) => ({
   async load() {
     set({ loading: true });
     set({ rows: await listDelayEvent(), loading: false });
+  },
+  setRows(rows) {
+    set({ rows });
   }
 }));

@@ -2,7 +2,12 @@ import { create } from "zustand";
 import { listResourceBooking } from "../api/ResourceBooking";
 import type { ResourceBooking } from "../types/ResourceBooking";
 
-type State = { rows: ResourceBooking[]; loading: boolean; load: () => Promise<void> };
+type State = {
+  rows: ResourceBooking[];
+  loading: boolean;
+  load: () => Promise<void>;
+  setRows: (rows: ResourceBooking[]) => void;
+};
 
 export const useResourceBookingStore = create<State>((set) => ({
   rows: [],
@@ -10,5 +15,8 @@ export const useResourceBookingStore = create<State>((set) => ({
   async load() {
     set({ loading: true });
     set({ rows: await listResourceBooking(), loading: false });
+  },
+  setRows(rows) {
+    set({ rows });
   }
 }));

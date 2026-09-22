@@ -1,21 +1,21 @@
 import { mockData } from "../mocks/seedData";
 import type { DelayEvent } from "../types/DelayEvent";
+import { request } from "./request";
 
 const endpoint = "/api/delay-event";
 
 export async function listDelayEvent(): Promise<DelayEvent[]> {
-  if (typeof fetch !== "undefined" && endpoint.startsWith("/api") && true) {
-    try {
-      const res = await fetch(endpoint);
-      if (res.ok) return await res.json();
-    } catch {
-      // Local mock fallback keeps the UI available during offline review.
-    }
+  try {
+    return await request<DelayEvent[]>(endpoint);
+  } catch {
+    return [...mockData.delayEvent];
   }
-  return [...(mockData.delayEvent as unknown as DelayEvent[])];
 }
 
-export async function saveDelayEvent(payload: DelayEvent) {
-  console.info("save DelayEvent", payload);
-  return payload;
+// resolveDelayEvent 关闭延误事件；关闭后未关闭延误归零。
+export async function resolveDelayEvent(id: number, actor = "dispatcher"): Promise<DelayEvent> {
+  return request<DelayEvent>(`${endpoint}/${id}/resolve`, {
+    method: "POST",
+    body: JSON.stringify({ actor })
+  });
 }
