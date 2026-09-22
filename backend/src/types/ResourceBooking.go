@@ -1,2 +1,9 @@
 package types
-// ResourceBooking keeps 资源预约 changes coupled across layers.
+
+import "groundTurn/src/models"
+
+type BookingBlocker struct {
+	models.ResourceBooking
+	ResourceCode string `json:"resource_code"`
+	Reason       string `json:"reason"`
+}

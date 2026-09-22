@@ -1,2 +1,19 @@
 package constants
-var TurnaroundStatus = []string{"ARRIVING","ON_STAND","IN_SERVICE","READY","DEPARTED","DELAYED"}
+
+const (
+	TurnaroundArriving  = "ARRIVING"
+	TurnaroundOnStand   = "ON_STAND"
+	TurnaroundInService = "IN_SERVICE"
+	TurnaroundReady     = "READY"
+	TurnaroundDeparted  = "DEPARTED"
+	TurnaroundDelayed   = "DELAYED"
+)
+
+var TurnaroundStatuses = []string{
+	TurnaroundArriving,
+	TurnaroundOnStand,
+	TurnaroundInService,
+	TurnaroundReady,
+	TurnaroundDeparted,
+	TurnaroundDelayed,
+}

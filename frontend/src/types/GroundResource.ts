@@ -7,3 +7,7 @@ export interface GroundResource {
   maintenance_due_at: string;
   owner_team: string;
 }
+
+export interface GroundResourceView extends GroundResource {
+  active_booking_count: number;
+}

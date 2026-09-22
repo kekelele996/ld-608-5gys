@@ -1,2 +1,8 @@
 package types
-// DelayEvent keeps 延误事件 changes coupled across layers.
+
+import "groundTurn/src/models"
+
+type DelayBlocker struct {
+	models.DelayEvent
+	Reason string `json:"reason"`
+}

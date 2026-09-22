@@ -1,2 +1,10 @@
 package constants
-var ResourceStatus = []string{"AVAILABLE","BOOKED","MAINTENANCE","OFFLINE"}
+
+const (
+	ResourceAvailable   = "AVAILABLE"
+	ResourceBooked      = "BOOKED"
+	ResourceMaintenance = "MAINTENANCE"
+	ResourceOffline     = "OFFLINE"
+)
+
+var ResourceStatuses = []string{ResourceAvailable, ResourceBooked, ResourceMaintenance, ResourceOffline}

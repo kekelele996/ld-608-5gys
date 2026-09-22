@@ -1,2 +1,8 @@
 package types
-// GroundResource keeps 保障资源 changes coupled across layers.
+
+import "groundTurn/src/models"
+
+type ResourceView struct {
+	models.GroundResource
+	ActiveBookingCount int `json:"active_booking_count"`
+}

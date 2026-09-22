@@ -7,4 +7,18 @@ export interface FlightTurnaround {
   departure_time: string;
   turnaround_status: string;
   delay_reason: string;
+  ready_at?: string | null;
+  timeline_synced_at?: string | null;
+}
+
+export interface TimelineEvent {
+  code: string;
+  label: string;
+  occurred_at: string;
+  status: string;
+}
+
+export interface FlightTurnaroundDetail extends FlightTurnaround {
+  task_completion_rate: number;
+  timeline: TimelineEvent[];
 }

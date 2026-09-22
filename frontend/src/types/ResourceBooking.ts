@@ -7,4 +7,10 @@ export interface ResourceBooking {
   end_time: string;
   booking_status: string;
   conflict_reason: string;
+  released_at?: string | null;
+}
+
+export interface BookingBlocker extends ResourceBooking {
+  resource_code: string;
+  reason: string;
 }

@@ -1,2 +1,14 @@
 package constructors
-// FlightTurnaround keeps 航班过站 changes coupled across layers.
+
+import (
+	"groundTurn/src/models"
+	"groundTurn/src/types"
+)
+
+func NewFlightDetail(flight models.FlightTurnaround, timeline []types.TimelineEvent, taskCompletionRate int) types.FlightTurnaroundDetail {
+	return types.FlightTurnaroundDetail{
+		FlightTurnaround:   flight,
+		TaskCompletionRate: taskCompletionRate,
+		Timeline:           timeline,
+	}
+}

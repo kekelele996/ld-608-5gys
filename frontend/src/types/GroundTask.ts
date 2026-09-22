@@ -5,7 +5,12 @@ export interface GroundTask {
   team_id: number;
   planned_start: string;
   deadline: string;
-  actual_finish: string;
+  actual_finish?: string | null;
   status: string;
   blocker_note: string;
+  timeline_synced_at?: string | null;
+}
+
+export interface TaskBlocker extends GroundTask {
+  reason: string;
 }

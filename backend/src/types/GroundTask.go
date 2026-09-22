@@ -1,2 +1,8 @@
 package types
-// GroundTask keeps 地勤任务 changes coupled across layers.
+
+import "groundTurn/src/models"
+
+type TaskBlocker struct {
+	models.GroundTask
+	Reason string `json:"reason"`
+}
